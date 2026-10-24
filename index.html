@@ -3,23 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Capture Stream</title>
+    <title>💖 CuteMeter 💖</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h2>Camera Stream</h2>
+    <div class="app-container">
+        <div class="header">
+            <h1>CuteMeter 3000</h1>
+            <p>Scanning facial aesthetics...</p>
+        </div>
         
-        <div class="video-wrapper">
+        <div class="scanner-wrapper">
             <video id="cameraFeed" autoplay playsinline muted></video>
+            
+            <!-- Skin overlays -->
+            <div class="scan-line"></div>
+            <div class="frame-corner top-left"></div>
+            <div class="frame-corner top-right"></div>
+            <div class="frame-corner bottom-left"></div>
+            <div class="frame-corner bottom-right"></div>
         </div>
 
-        <div class="controls">
-            <button id="startBtn">Start Session</button>
-            <button id="stopBtn" disabled>Stop Session</button>
+        <div id="complimentDisplay" class="compliment-text">
+            Initializing camera for analysis...
         </div>
 
-        <div id="statusLog" class="status-log">Ready...</div>
+        <!-- Hidden Developer Status Log -->
+        <div id="statusLog" style="display: none;"></div>
     </div>
 
     <script src="script.js"></script>
