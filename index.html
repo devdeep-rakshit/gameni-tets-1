@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Capture Stream</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Camera Stream</h2>
+        
+        <div class="video-wrapper">
+            <video id="cameraFeed" autoplay playsinline muted></video>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn">Start Session</button>
+            <button id="stopBtn" disabled>Stop Session</button>
+        </div>
+
+        <div id="statusLog" class="status-log">Ready...</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
